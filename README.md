@@ -1,4 +1,4 @@
-# Custom Dynamic Memory Allocator (C)
+# Custom Dynamic Memory Allocator in C
 
 A user-space heap allocator implemented in C using `mmap`, supporting
 `malloc` and `free` with a linked-list free list and first-fit

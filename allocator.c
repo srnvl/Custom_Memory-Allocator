@@ -84,3 +84,18 @@ size_t align_size(size_t size) {
         - First part becomes the allocated block that we need.
         - Remainder stays as a smaller, free block.
 ==============================================================================================*/
+
+void split_block(Block* block, size_t size){
+    // Only split if there's enough room for a new block header + some data
+    if(block->size >= size + BLOCK_HEADER_SIZE + 8){
+        // Create a new block in the remaining space
+        Block* new_block = (Block*)((char*)block + BLOCK_HEADER_SIZE + size);
+        new_block->size = block->size - size - BLOCK_HEADER_SIZE;
+        new_block->next = block->next;
+        new_block->is_Free = 1;
+
+        // Update the current block
+        block->size = size;
+        block->next = new_block;
+    }
+}

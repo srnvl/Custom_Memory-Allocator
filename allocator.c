@@ -64,6 +64,22 @@ void allocator_init(size_t size){
     free_list_head->size = size - BLOCK_HEADER_SIZE;
     free_list_head->is_Free = 1;
     free_list_head->next = NULL;
-    
+
     printf("Allocator initialized with %zu bytes\n", size);
 }
+
+/*=============================================================================================
+    STEP 4. Align size:
+        - Memory should be aligned to word boundaries for performance.
+        - This function rounds up to the nearest multiple of 8.
+==============================================================================================*/
+
+size_t align_size(size_t size) {
+    return (size + 7) & ~7;  // Round up to multiple of 8
+}
+
+/*=============================================================================================
+    STEP 4. Align size:
+        - Memory should be aligned to word boundaries for performance.
+        - This function rounds up to the nearest multiple of 8.
+==============================================================================================*/

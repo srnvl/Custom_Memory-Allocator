@@ -152,3 +152,104 @@ void* my_malloc(size_t size){
         - Mark the block as free and add it back to the free list.
         - Try to merge with adjacent free blocks to reduce fragmentation.
 ==============================================================================================*/
+
+void my_free(void* ptr){
+    if(ptr == NULL)
+    {
+        return;
+    }
+
+    // Get the header of the block
+    Block* block = (Block*)((char*)ptr - BLOCK_HEADER_SIZE);
+
+    // Free the block
+    block->is_Free = 1;
+
+    // Coalescing - Mergining two adjacent free spaces
+
+    if(block->next && block->next->is_Free)
+    {
+        block->size = BLOCK_HEADER_SIZE + block->next->size;
+        block->next = block->next->next;
+    }
+    printf("Freed %zu bytes\n", block->size);
+
+}
+
+/*============================================================================================
+    STEP 8. Utility functions:
+        - Helper functions to visualize and debug the allocator.
+==============================================================================================*/
+
+void print_memory_map() {
+    printf("\n=== Memory Map ===\n");
+    Block* current = free_list_head;
+    int block_num = 0;
+    
+    while (current != NULL) {
+        printf("Block %d: size=%zu, %s\n", 
+               block_num++, 
+               current->size,
+               current->is_Free ? "FREE" : "ALLOCATED");
+        current = current->next;
+    }
+    printf("==================\n\n");
+}
+
+void allocator_destroy() {
+    if (memory_pool != NULL) {
+        munmap(memory_pool, pool_size);
+        memory_pool = NULL;
+        free_list_head = NULL;
+        pool_size = 0;
+        printf("Allocator destroyed\n");
+    }
+}
+
+/* ==========================================================================================
+    STEP 9. Testing the Allocator:
+============================================================================================= */
+
+int main() {
+    printf("Building a Custom Memory Allocator\n");
+    printf("===================================\n\n");
+    
+    // Initialize with 1KB of memory
+    allocator_init(1024);
+    print_memory_map();
+    
+    // Test 1: Allocate some memory
+    printf("Test 1: Allocating 100 bytes\n");
+    void* ptr1 = my_malloc(100);
+    if (ptr1) {
+        strcpy((char*)ptr1, "Hello from custom allocator!");
+        printf("Stored: %s\n", (char*)ptr1);
+    }
+    print_memory_map();
+    
+    // Test 2: Allocate more memory
+    printf("Test 2: Allocating 200 bytes\n");
+    void* ptr2 = my_malloc(200);
+    print_memory_map();
+    
+    // Test 3: Free the first block
+    printf("Test 3: Freeing first allocation\n");
+    my_free(ptr1);
+    print_memory_map();
+    
+    // Test 4: Allocate again (should reuse freed space)
+    printf("Test 4: Allocating 50 bytes (should reuse freed space)\n");
+    void* ptr3 = my_malloc(50);
+    print_memory_map();
+    
+    // Test 5: Free everything
+    printf("Test 5: Freeing all allocations\n");
+    my_free(ptr2);
+    my_free(ptr3);
+    print_memory_map();
+    
+    // Cleanup
+    allocator_destroy();
+    
+    return 0;
+}

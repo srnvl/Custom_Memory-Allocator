@@ -79,7 +79,8 @@ size_t align_size(size_t size) {
 }
 
 /*=============================================================================================
-    STEP 4. Align size:
-        - Memory should be aligned to word boundaries for performance.
-        - This function rounds up to the nearest multiple of 8.
+    STEP 5. Split Block:
+    If a block we find is larger than we needed ->
+        - First part becomes the allocated block that we need.
+        - Remainder stays as a smaller, free block.
 ==============================================================================================*/

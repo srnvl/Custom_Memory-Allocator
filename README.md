@@ -35,7 +35,8 @@ Allocation flow:
 3. Split block if oversized\
 4. Return pointer past metadata
 
-Free flow: 1. Mark block as free\
+Free flow: 
+1. Mark block as free\
 2. Coalesce with adjacent free block
 
 ## Build & Run

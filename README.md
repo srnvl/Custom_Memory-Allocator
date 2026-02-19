@@ -29,7 +29,8 @@ Each block stores metadata in-band:
         struct Block* next;
     } Block;
 
-Allocation flow: 1. Align requested size to 8 bytes\
+Allocation flow: 
+1. Align requested size to 8 bytes\
 2. Search free list (first-fit)\
 3. Split block if oversized\
 4. Return pointer past metadata

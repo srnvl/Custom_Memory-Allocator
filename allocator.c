@@ -11,6 +11,13 @@
 
 ==============================================================================================*/
 
+/*=================================== STRATEGY ================================================
+
+    1. Keep a linked list of free memory blocks.
+    2. When allocating, find the first block big enough.
+    3. When freeing, return the block to the free list.
+
+==============================================================================================*/
 
 /*=============================================================================================
     STEP 1. Defining the block header structure:
@@ -99,3 +106,49 @@ void split_block(Block* block, size_t size){
         block->next = new_block;
     }
 }
+
+/*=============================================================================================
+    STEP 6. Allocating the memory:
+        - Search the free list for a block big enough using first-fit strategy.
+        - Split the block if it's too large, then return pointer to usable memory.
+==============================================================================================*/
+
+void* my_malloc(size_t size){
+    if(size == 0){
+        return NULL;
+    }
+    // Align the size
+    size = align_size(size);
+
+    Block* current = free_list_head;
+    Block* prev = NULL;
+    while(current != NULL){
+        if(current->is_Free && current->size >= size)
+        {
+            // A suitable block is found!
+
+            // Split if the block requested is larger than expected
+            
+            split_block(current, size); 
+
+            // Current block is occupied
+
+            current->is_Free = 0;
+
+            return (void*)((char*)current + BLOCK_HEADER_SIZE);
+        }
+
+        prev = current;
+        current = current->next;
+
+    }
+
+    printf("Out of memory: couldn't allocate %zu bytes!\n", size);
+
+}
+
+/*============================================================================================
+    STEP 7. Free the memory:
+        - Mark the block as free and add it back to the free list.
+        - Try to merge with adjacent free blocks to reduce fragmentation.
+==============================================================================================*/
